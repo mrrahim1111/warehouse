@@ -90,7 +90,7 @@ export const CommandBar: React.FC = () => {
   if (!isCommandBarOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] bg-black/60 backdrop-blur-sm" onClick={() => setIsCommandBarOpen(false)}>
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] bg-black/60 backdrop-blur-sm" onClick={() => setIsCommandBarOpen(false)} role="dialog" aria-modal="true" aria-label="Command Palette">
       <div className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40 overflow-hidden" onClick={e => e.stopPropagation()}>
         {/* Search Input */}
         <div className="flex items-center gap-3 border-b border-slate-800 px-4 py-3">
@@ -101,6 +101,7 @@ export const CommandBar: React.FC = () => {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Type a command or search..."
+            aria-label="Search commands"
             className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none"
           />
           <kbd className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-slate-400">ESC</kbd>
@@ -115,6 +116,7 @@ export const CommandBar: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={item.action}
+                  aria-label={item.label}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-slate-800/60 transition-colors"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-slate-400">

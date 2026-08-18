@@ -145,7 +145,7 @@ export const InventoryView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setSelectedDetail(null)}>
           <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-white">{detailItem.sku} — Inventory Health</h3>
+              <h3 className="text-base font-bold text-white">{detailItem.sku} — <StatusBadge type="stock" value={detailItem.status} /></h3>
               <button onClick={() => setSelectedDetail(null)} className="text-slate-400 hover:text-white">✕</button>
             </div>
 
@@ -181,19 +181,37 @@ export const InventoryView: React.FC = () => {
               </div>
             </div>
 
-            <div className="rounded-lg border border-cyan-500/20 bg-cyan-950/20 p-3 mb-4">
-              <div className="flex items-center gap-2 mb-1">
-                <BrainCircuit className="h-4 w-4 text-cyan-400" />
-                <span className="text-xs font-bold text-cyan-300">AI FORECAST</span>
+            {detailItem.status === 'Overstock' ? (
+              <div className="rounded-lg border border-purple-500/30 bg-purple-950/30 p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-bold text-white">{detailItem.sku} — Overstock</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 mb-3">
+                  <div>Current: <span className="font-bold text-white">{detailItem.currentStock}</span></div>
+                  <div>Average demand: <span className="font-bold text-white">{detailItem.dailyAvgDemand * 7}/week</span></div>
+                </div>
+                <div className="rounded-md bg-purple-900/50 p-2.5 flex items-start gap-2">
+                  <span className="text-base leading-none">💡</span>
+                  <p className="text-sm font-bold text-purple-200">
+                    AI: Reduce next purchase order by 35%.
+                  </p>
+                </div>
               </div>
-              <p className="text-[11px] text-slate-300">{detailItem.aiForecast}</p>
-            </div>
+            ) : (
+              <div className="rounded-lg border border-cyan-500/20 bg-cyan-950/20 p-3 mb-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <BrainCircuit className="h-4 w-4 text-cyan-400" />
+                  <span className="text-xs font-bold text-cyan-300">AI FORECAST</span>
+                </div>
+                <p className="text-[11px] text-slate-300">{detailItem.aiForecast}</p>
+              </div>
+            )}
 
             <button
               onClick={() => { createReorder(detailItem.sku, detailItem.reorderQuantity); setSelectedDetail(null); }}
               className="w-full rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
             >
-              Create Purchase Recommendation ({detailItem.reorderQuantity} units)
+              {detailItem.status === 'Overstock' ? 'Apply AI Recommendation (Reduce PO)' : `Create Purchase Recommendation (${detailItem.reorderQuantity} units)`}
             </button>
           </div>
         </div>

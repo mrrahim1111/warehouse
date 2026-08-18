@@ -91,10 +91,21 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ type, value, size = 'm
     }
   }
 
+  let displayValue = value;
+  if (type === 'stock') {
+    switch (value) {
+      case 'Healthy': displayValue = '🟢 Healthy'; break;
+      case 'Low Stock': displayValue = '🟠 Low Stock'; break;
+      case 'Critical': displayValue = '🔴 Critical'; break;
+      case 'Out of Stock': displayValue = '⚫ Out of Stock'; break;
+      case 'Overstock': displayValue = '🔵 Overstock'; break;
+    }
+  }
+
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-md border ${sizeClasses} ${colorStyle}`}>
-      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-      {value}
+      {type !== 'stock' && <span className="h-1.5 w-1.5 rounded-full bg-current" />}
+      {displayValue}
     </span>
   );
 };

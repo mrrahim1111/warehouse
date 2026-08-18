@@ -68,6 +68,7 @@ export const Topbar: React.FC = () => {
           <select
             value={selectedWarehouse}
             onChange={(e) => setSelectedWarehouse(e.target.value)}
+            aria-label="Select Warehouse"
             className="bg-transparent text-xs font-semibold text-slate-200 outline-none cursor-pointer"
           >
             <option value="Austin Main Hub (TX-01)" className="bg-slate-900 text-white">Austin Main Hub (TX-01)</option>
@@ -99,6 +100,7 @@ export const Topbar: React.FC = () => {
           <select
             value={currentLanguage}
             onChange={(e) => setLanguage(e.target.value as LanguageCode)}
+            aria-label="Select Language"
             className="bg-transparent text-xs font-semibold text-slate-200 outline-none cursor-pointer"
           >
             {SUPPORTED_LANGUAGES.map(lang => (
@@ -143,6 +145,8 @@ export const Topbar: React.FC = () => {
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
+            aria-label={`Notifications, ${unreadCount} unread`}
+            aria-expanded={showNotifications}
             className="relative rounded-xl border border-slate-800 bg-slate-900 p-2 text-slate-300 transition-colors hover:bg-slate-800"
           >
             <Bell className="h-4 w-4" />

@@ -88,6 +88,8 @@ export const Sidebar: React.FC = () => {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
           className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -105,6 +107,8 @@ export const Sidebar: React.FC = () => {
                 key={item.id}
                 onClick={() => setActiveView(item.id)}
                 title={collapsed ? item.label : undefined}
+                aria-label={`Navigate to ${item.label}`}
+                aria-current={isActive ? 'page' : undefined}
                 className={`group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs font-semibold transition-all duration-150 ${
                   isActive
                     ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-400 border border-cyan-500/30 shadow-sm shadow-cyan-900/30'

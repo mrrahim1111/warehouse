@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWarehouse } from '../../context/WarehouseContext';
 import { BrainCircuit, Users, Package, AlertTriangle, Map, Zap } from 'lucide-react';
 
 export const WarehouseView: React.FC = () => {
   const { zones, rerouteZoneB } = useWarehouse();
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  
+  const zoneDetail = selectedZone ? zones.find(z => z.code === selectedZone) : null;
 
   const getHeatColor = (score: number) => {
     if (score >= 80) return 'from-red-600/30 to-red-900/20 border-red-500/40';
@@ -16,6 +19,13 @@ export const WarehouseView: React.FC = () => {
     if (level === 'High') return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
     if (level === 'Medium') return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
     return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+  };
+
+  const getCongestionEmoji = (level: string) => {
+    if (level === 'Severe') return '🔴 Congested';
+    if (level === 'High') return '🟠 High Activity';
+    if (level === 'Medium') return '🟡 Medium Activity';
+    return '🟢 Normal';
   };
 
   return (
@@ -43,6 +53,7 @@ export const WarehouseView: React.FC = () => {
           {zones.filter(z => ['ZA', 'ZB', 'ZC', 'ZD'].includes(z.code)).map(zone => (
             <div
               key={zone.id}
+              onClick={() => setSelectedZone(zone.code)}
               className={`relative overflow-hidden rounded-xl border bg-gradient-to-b p-4 transition-all hover:scale-[1.02] cursor-pointer ${getHeatColor(zone.heatmapScore)} ${zone.heatmapScore >= 80 ? 'animate-pulse-glow' : ''}`}
             >
               <div className="flex items-center justify-between mb-3">
@@ -51,7 +62,7 @@ export const WarehouseView: React.FC = () => {
                   {zone.congestionLevel}
                 </span>
               </div>
-              <h4 className="text-xs font-bold text-white mb-2">{zone.name.split(' - ')[0]}</h4>
+              <h4 className="text-xs font-bold text-white mb-2">ZONE {zone.code.replace('Z', '')} {getCongestionEmoji(zone.congestionLevel)}</h4>
               <p className="text-[10px] text-slate-400 mb-3">{zone.category}</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-center rounded-lg bg-slate-900/60 p-1.5">
@@ -141,6 +152,55 @@ export const WarehouseView: React.FC = () => {
           >
             Apply Reroute Recommendation
           </button>
+        </div>
+      )}
+
+      {/* Zone Detail Modal Overlay */}
+      {zoneDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setSelectedZone(null)}>
+          <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white">ZONE {zoneDetail.code.replace('Z', '')} {getCongestionEmoji(zoneDetail.congestionLevel)}</h3>
+              <button onClick={() => setSelectedZone(null)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-5">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                <p className="text-xs text-slate-400 mb-1">Active Tasks</p>
+                <p className="text-xl font-bold text-white">{zoneDetail.pendingPicksCount + 12}</p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                <p className="text-xs text-slate-400 mb-1">Capacity</p>
+                <p className="text-xl font-bold text-white">{zoneDetail.heatmapScore}%</p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                <p className="text-xs text-slate-400 mb-1">Avg. Picking Time</p>
+                <p className="text-xl font-bold text-white">{zoneDetail.congestionLevel === 'Severe' ? '8.4' : '2.1'} min</p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                <p className="text-xs text-slate-400 mb-1">Workers</p>
+                <p className="text-xl font-bold text-white">{zoneDetail.activeWorkersCount}</p>
+              </div>
+            </div>
+
+            {zoneDetail.congestionLevel === 'Severe' && (
+              <div className="rounded-lg border border-red-500/20 bg-red-950/20 p-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <BrainCircuit className="h-5 w-5 text-red-400" />
+                  <span className="text-sm font-bold text-red-300">AI Recommendation</span>
+                </div>
+                <p className="text-sm text-slate-300">
+                  Move 2 workers from Zone D.
+                </p>
+                <button
+                  onClick={() => { rerouteZoneB(); setSelectedZone(null); }}
+                  className="mt-3 w-full rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all"
+                >
+                  Apply Recommendation
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

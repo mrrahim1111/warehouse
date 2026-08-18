@@ -24,6 +24,7 @@ export const OrdersView: React.FC = () => {
   }).sort((a, b) => b.priorityScore - a.priorityScore);
 
   const selectedOrder = selectedOrderId ? orders.find(o => o.id === selectedOrderId) : null;
+  const topCriticalOrder = [...orders].sort((a, b) => b.priorityScore - a.priorityScore)[0];
 
   const stages = ['Created', 'Priority Assigned', 'Inventory Checked', 'Stock Allocated', 'Picking', 'Packing', 'Quality Check', 'Ready for Dispatch', 'Dispatched', 'Delivered'];
 
@@ -183,6 +184,31 @@ export const OrdersView: React.FC = () => {
 
   return (
     <div className="space-y-5">
+      {/* AI Priority Engine Banner */}
+      {topCriticalOrder && !selectedOrder && (
+        <div 
+          className="rounded-2xl border border-red-500/30 bg-red-950/20 p-5 cursor-pointer hover:bg-red-950/30 transition-all shadow-lg shadow-red-900/10"
+          onClick={() => setSelectedOrderId(topCriticalOrder.id)}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <div className="rounded-lg bg-red-500/20 p-2"><BrainCircuit className="h-5 w-5 text-red-400 animate-pulse" /></div>
+            <div>
+              <h3 className="text-sm font-bold text-red-300">🤖 AI Priority Engine Alert</h3>
+              <p className="text-xs text-slate-400">Critical intervention required</p>
+            </div>
+          </div>
+          
+          <div className="rounded-xl border border-red-500/20 bg-slate-950/60 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-white">{topCriticalOrder.id} — Priority {topCriticalOrder.priorityScore}/100 🔴</span>
+            </div>
+            <p className="text-sm font-bold text-red-300">
+              💡 AI says: {topCriticalOrder.aiRecommendation || `Dispatch immediately — already ${Math.abs(topCriticalOrder.deadlineMinutesRemaining)} min overdue.`}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
