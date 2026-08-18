@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { expect, test, describe } from 'vitest';
 import { StatusBadge } from './StatusBadge';
@@ -14,7 +13,7 @@ describe('StatusBadge Component', () => {
 
   test('renders stock badge correctly', () => {
     render(<StatusBadge type="stock" value="Healthy" />);
-    const badge = screen.getByText('Healthy');
+    const badge = screen.getByText('🟢 Healthy');
     expect(badge).toBeInTheDocument();
     expect(badge.className).toContain('text-emerald-400');
   });
